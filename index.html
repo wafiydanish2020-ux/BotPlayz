@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BotPlayz AI - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0d1117; }
+        .sidebar { background-color: #010409; transition: all 0.3s ease; }
+        .chat-area { background-color: #0d1117; }
+        .glass-input { background: rgba(22, 27, 44, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        /* Scrollbar biar ala folder */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-gray-300 h-screen flex overflow-hidden">
+
+    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 z-50 w-72 -translate-x-full lg:relative lg:translate-x-0 flex flex-col border-r border-white/10">
+        <div class="p-4">
+            <button onclick="startNewChat()" class="flex items-center justify-between w-full p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all shadow-lg shadow-blue-900/20">
+                <span class="font-bold text-sm">+ New Chat</span>
+                <kbd class="text-[10px] opacity-50 bg-black/20 px-1.5 rounded">Ctrl K</kbd>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-3 space-y-1" id="history-container">
+            <p class="text-[10px] font-bold text-gray-500 px-3 py-4 uppercase tracking-[0.2em]">Recent History</p>
+            <div class="animate-pulse space-y-2 px-3">
+                <div class="h-8 bg-white/5 rounded"></div>
+                <div class="h-8 bg-white/5 rounded w-3/4"></div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-white/10" id="auth-section">
+            <button onclick="login()" id="login-btn" class="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium transition-all">
+                Sign In with Google
+            </button>
+            <div id="user-profile" class="hidden flex items-center gap-3 p-2 bg-white/5 rounded-xl border border-white/10">
+                <img id="user-photo" src="" class="w-8 h-8 rounded-full border border-blue-500">
+                <div class="flex-1 min-w-0">
+                    <p id="user-name" class="text-xs font-bold truncate text-white"></p>
+                    <p class="text-[9px] text-blue-400">Pro Account</p>
+                </div>
+                <button onclick="logout()" class="text-gray-500 hover:text-red-400">🚪</button>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+        <header class="lg:hidden p-4 flex items-center justify-between border-b border-white/5">
+            <button onclick="toggleSidebar()" class="text-2xl">☰</button>
+            <span class="font-extrabold text-blue-500">BotPlayz</span>
+            <div class="w-8"></div>
+        </header>
+
+        <div id="display" class="flex-1 overflow-y-auto p-4 lg:p-10 space-y-6">
+            <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center space-y-4">
+                <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-3xl shadow-2xl shadow-blue-500/40">🤖</div>
+                <h2 class="text-2xl font-extrabold text-white">Apa yang bisa BotPlayz bantu?</h2>
+                <p class="text-sm text-gray-500 max-w-sm">Analisis file, video, atau lagu dengan kecerdasan Gemini 1.5 Flash.</p>
+            </div>
+        </div>
+
+        <div class="p-4 bg-gradient-to-t from-[#0d1117] via-[#0d1117] to-transparent">
+            <div class="max-w-3xl mx-auto glass-input rounded-2xl p-2 shadow-2xl">
+                <div id="file-preview" class="hidden px-4 py-2 flex items-center gap-2 border-b border-white/5 mb-2">
+                    <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded" id="file-type-tag">FILE</span>
+                    <span class="text-xs truncate" id="file-name">filename.mp4</span>
+                    <button onclick="clearFile()" class="ml-auto text-gray-500 text-xs">✕</button>
+                </div>
+
+                <div class="flex items-end gap-2 px-2">
+                    <label class="p-2.5 hover:bg-white/5 rounded-xl cursor-pointer text-gray-400 transition-all">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        <input type="file" id="media-upload" class="hidden">
+                    </label>
+
+                    <textarea id="user-msg" placeholder="Tanya sesuatu..." rows="1" class="flex-1 bg-transparent border-none outline-none py-3 text-sm resize-none max-h-40" oninput="autoGrow(this)"></textarea>
+
+                    <button id="send-btn" class="mb-1 p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-500 active:scale-95 transition-all shadow-lg shadow-blue-600/20">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+            <p class="text-[9px] text-center text-gray-600 mt-3 font-medium uppercase tracking-widest">BotPlayz Secure Environment v3.0</p>
+        </div>
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('-translate-x-full');
+        }
+
+        function autoGrow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight) + "px";
+            if(element.value.length > 0) {
+                document.getElementById('welcome-screen').classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
